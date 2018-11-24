@@ -82,6 +82,18 @@ public:
         }
     }
 
+    void print(int xPos, int yPos, char *string, int color = color::white) {
+        if ((xPos >= 0 && xPos <= screenWidth) && (yPos >= 0 && yPos <= screenHigh)) {
+            xPosition = xPos;
+            yPosition = yPos;
+            headAddress = startAddress + (yPosition * screenWidth) + xPosition; 
+            print(string, color);
+        } else {
+            char error[] = "\nError: incorrect position";
+            print(error, color::red);
+        }
+    }
+
 private:
     void print(char symbol, int color = color::white) {
         incXPosition();
@@ -156,9 +168,19 @@ void testCase2()
     }
 }
 
+void testCase3()
+{
+    Display display;
+    char string[] = "Hello, C world!";
+
+    display.print(string);
+    display.print(10, 10, string, color::green);
+    display.print(string);
+    display.print(10, 100, string);
+}
 /******************************************/
 
 void main()
 {
-    testCase2();
+    testCase3();
 }

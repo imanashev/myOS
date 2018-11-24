@@ -3,7 +3,7 @@
 jmp 0x0:bootblock
 
 %include "gdt.inc"
-%define SECTORS 3            ; sectors to read
+%define SECTORS 4            ; sectors to read
 
 clear_screen:
 	pusha
