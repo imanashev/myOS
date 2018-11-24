@@ -1,9 +1,9 @@
 [ORG 0x7c00]
 [BITS 16]
-jmp main
+jmp 0x0:bootblock
 
 %include "gdt.inc"
-%define SECTORS 2            ; sectors to read
+%define SECTORS 3            ; sectors to read
 
 clear_screen:
 	pusha
@@ -44,7 +44,7 @@ set_pe_bit:
     popa
     ret
 
-main:
+bootblock:
     xor ax, ax
     mov ss, ax
     mov ds, ax
@@ -53,7 +53,7 @@ main:
     call read_disk
     call install_gdt
     call set_pe_bit
-    jmp 0x7e00      ;jmp to protected_mode
+    jmp 08h:0x7e00      ;jmp to protected_mode
 
 times (510-($-$$)) nop
 dw 0xaa55
