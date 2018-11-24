@@ -25,7 +25,7 @@ enum {
 class Display {
 public:
     Display() {
-        headAddress = startAddress = (char*)0xB8000;
+        headAddress = startAddress = (unsigned short*)0xB8000;
         xPosition = yPosition = 0;
         screenHigh = 25;
         screenWidth = 80;
@@ -60,19 +60,19 @@ public:
     }
 
     void scroll(int lines = 1) {
-        int skippedBytes = lines * screenWidth * 2;
-        char *newHeadAddress = startAddress;
-        char *scrolled = startAddress + skippedBytes;
+        int skippedBytes = lines * screenWidth;
+        unsigned short *newHeadAddress = startAddress;
+        unsigned short *scrolled = startAddress + skippedBytes;
 
-        int currentByte = skippedBytes;
-        while (currentByte <= (yPosition * screenWidth * 2) + (xPosition * 2)) {
+        int currentPosition = skippedBytes;
+        while (currentPosition <= yPosition * screenWidth + xPosition) {
             *newHeadAddress++ = *scrolled++;
-            ++currentByte;
+            ++currentPosition;
         }
         headAddress = --newHeadAddress;
-        while(currentByte <= screenHigh * screenWidth * 2) {
+        while(currentPosition <= screenHigh * screenWidth) {
             *newHeadAddress++ = 0;
-            ++currentByte;
+            ++currentPosition;
         }
 
         // if(yPosition - lines >= 0) {
@@ -85,13 +85,12 @@ public:
 private:
     void print(char symbol, int color = color::white) {
         incXPosition();
-        *headAddress++ = symbol;
-        *headAddress++ = color;
+        *headAddress++ = symbol | (color << 8);
     }
 
     void newLine() {
         incYPosition();
-        int skipSpace = (screenWidth - xPosition) * 2;
+        int skipSpace = screenWidth - xPosition;
         headAddress = headAddress + skipSpace;
         xPosition = 0;
     }
@@ -115,8 +114,8 @@ private:
         }
     }
 
-    char *startAddress; // const
-    char *headAddress;
+    unsigned short *startAddress; // const
+    unsigned short *headAddress;
 
     int xPosition;
     int yPosition;
