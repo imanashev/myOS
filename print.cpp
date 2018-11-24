@@ -70,16 +70,16 @@ public:
             ++currentPosition;
         }
         headAddress = --newHeadAddress;
-        while(currentPosition <= screenHigh * screenWidth) {
-            *newHeadAddress++ = 0;
+        while(currentPosition <= screenHigh * screenWidth * 2) {
+            *newHeadAddress++ = (unsigned short) 0;
             ++currentPosition;
         }
 
-        // if(yPosition - lines >= 0) {
-        //     yPosition -= lines;
-        // } else {
-        //     yPosition = 0;
-        // }
+        if(yPosition - (lines - 1) >= 0) {
+            yPosition -= (lines -1);
+        } else {
+            yPosition = 0;
+        }
     }
 
 private:
@@ -109,8 +109,8 @@ private:
 
     void incYPosition() {
         if(++yPosition > screenHigh) {
-            scroll();
-            yPosition -=1;
+            --yPosition;
+            scroll(6);
         }
     }
 
@@ -124,7 +124,20 @@ private:
     int screenWidth;  // const
 };
 
-void main()
+/******************************************/
+
+void testCase1()
+{
+    Display display;
+    char string1[] = "Hello, C world!\n";
+    char string2[] = "FooBar\n";
+
+    display.print(string1, color::red);
+    display.print(string2, color::green);
+    display.scroll();
+}
+
+void testCase2() 
 {
     Display display;
     char string[] = ": \tHello, C world!\n";
@@ -141,5 +154,11 @@ void main()
         }
         j++;
     }
+}
 
+/******************************************/
+
+void main()
+{
+    testCase2();
 }

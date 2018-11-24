@@ -1,2 +1,4 @@
 bootblock
+protected_mode
+*.o
 disk.img
