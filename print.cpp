@@ -1,42 +1,35 @@
+#define SCREEN_HIGH 25
+#define SCREEN_WIDTH 80
+#define SCROLL_LINES 4
+
 namespace color {
-
 enum {
-    black,
-    blue,	
-    green,
-    cyan,	
-    red,
-    magenta,	
-    brown,
-    light_gray,
-    dark_gray,
-    light_blue,	
-    light_green,	
-    light_cyan,
-    light_red,
-    light_magenta,	
-    yellow,
-    white
+    black,        blue,
+    green,        cyan,
+    red,          magenta,
+    brown,        light_gray,
+    dark_gray,    light_blue,
+    light_green,  light_cyan,
+    light_red,    light_magenta,
+    yellow,       white
 };
-
 } // namespace color
 
-
-class Display {
+class Screen {
 public:
-    Display() {
-        headAddress = startAddress = (unsigned short*)0xB8000;
-        xPosition = yPosition = 0;
-        screenHigh = 25;
-        screenWidth = 80;
-    };
+    Screen() : screenHigh(SCREEN_HIGH),
+               screenWidth(SCREEN_WIDTH),
+               videoMemory((unsigned short *)0xb8000),
+               xPos(0),
+               yPos(0)
+    {}
 
-    void print(char *string, int color = color::white) { 
-        char *symbol = string;
-        while(*symbol != 0) {
-            switch (*symbol) {
+    void print(const char *string, int color = color::white) {
+        char c = string[0];
+        for(int i = 1; c; ++i) {
+            switch (c) {
             case 9: {
-                printTab();
+                tab();
                 break;
             }
             case 10: {
@@ -44,143 +37,115 @@ public:
                 break;
             }
             default: {
-                print(*symbol, color);
+                print(c, color);
             }
             }
-            ++symbol;
+            c = string[i];
         }
     }
 
     void print(int number, int color = color::white) {
+        // Todo: cant print 0
         if(number != 0) {
             print(number / 10, color);
-            char digit = '0' + (number % 10);
+            const char digit = '0' + (number % 10);
             print(digit, color);
         }
     }
 
-    void scroll(int lines = 1) {
-        int skippedBytes = lines * screenWidth;
-        unsigned short *newHeadAddress = startAddress;
-        unsigned short *scrolled = startAddress + skippedBytes;
-
-        int currentPosition = skippedBytes;
-        while (currentPosition <= yPosition * screenWidth + xPosition) {
-            *newHeadAddress++ = *scrolled++;
-            ++currentPosition;
-        }
-        headAddress = --newHeadAddress;
-        while(currentPosition <= screenHigh * screenWidth * 2) {
-            *newHeadAddress++ = (unsigned short) 0;
-            ++currentPosition;
-        }
-
-        if(yPosition - (lines - 1) >= 0) {
-            yPosition -= (lines -1);
-        } else {
-            yPosition = 0;
-        }
+    void print(const char symbol, int color = color::white) {
+        videoMemory[yPos * screenWidth + xPos] = symbol | (color << 8);
+        incXPos();
     }
 
-    void print(int xPos, int yPos, char *string, int color = color::white) {
-        if ((xPos >= 0 && xPos <= screenWidth) && (yPos >= 0 && yPos <= screenHigh)) {
-            xPosition = xPos;
-            yPosition = yPos;
-            headAddress = startAddress + (yPosition * screenWidth) + xPosition; 
-            print(string, color);
+    void scroll(int lines = 1) {
+        int writePos = 0;
+        int readPos = lines * screenWidth;
+
+        //memory after visible screen (screenWidth * screenHigh) must be null
+        while (writePos <= screenWidth * screenHigh) {
+            videoMemory[writePos++] = videoMemory[readPos++];
+        }
+
+        if (lines > yPos) {
+            yPos = 0;
         } else {
-            char error[] = "\nError: incorrect position";
-            print(error, color::red);
+            yPos = yPos - lines + 1;
         }
     }
 
 private:
-    void print(char symbol, int color = color::white) {
-        incXPosition();
-        *headAddress++ = symbol | (color << 8);
-    }
-
     void newLine() {
-        incYPosition();
-        int skipSpace = screenWidth - xPosition;
-        headAddress = headAddress + skipSpace;
-        xPosition = 0;
+        incYPos();
+        xPos = 0;
     }
 
-    void printTab() {
-        char tab[] = "    ";
+    void tab() {
+        const char tab[] = "    ";
         print(tab);
     }
 
-    void incXPosition() {
-        if (++xPosition > screenWidth) {
-            xPosition = 0;
-            incYPosition();
+    void incXPos() {
+        if (++xPos > screenWidth) {
+            xPos = 0;
+            incYPos();
         }
     }
 
-    void incYPosition() {
-        if(++yPosition > screenHigh) {
-            --yPosition;
-            scroll(6);
+    void incYPos() {
+        if(yPos < screenHigh) {
+            ++yPos;
+        } else {
+            scroll(SCROLL_LINES);
         }
     }
 
-    unsigned short *startAddress; // const
-    unsigned short *headAddress;
+    int xPos;
+    int yPos;
 
-    int xPosition;
-    int yPosition;
+    const int screenHigh;
+    const int screenWidth;
 
-    int screenHigh;  // const
-    int screenWidth;  // const
+    unsigned short *videoMemory;
 };
 
 /******************************************/
 
 void testCase1()
 {
-    Display display;
+    Screen screen;
     char string1[] = "Hello, C world!\n";
     char string2[] = "FooBar\n";
 
-    display.print(string1, color::red);
-    display.print(string2, color::green);
-    display.scroll();
+    screen.print(string1, color::red);
+    screen.print(string2, color::green);
+    screen.scroll();
 }
 
-void testCase2() 
+void testCase2()
 {
-    Display display;
-    char string[] = ": \tHello, C world!\n";
-    int i = 0;
+    Screen screen;
+    char string[] = ":\tHello, C world!\n";
+    int i = 1;
+    while(i <= 20) {
+        screen.print(i);
+        screen.print(string, i % 15 + 1);
+        ++i;
+    }
     int j = 0;
-    while(i < 20) {
-        display.print(i);
-        display.print(string, i++ %15 + 1);
-    }
     while(true) {
-        if(j %10000000 == 0) {
-            display.print(i);
-            display.print(string, i++ %15 + 1);
+        if(j % 10000000 == 0) {
+            screen.print(i);
+            screen.print(string, i % 15 + 1);
+            ++i;
         }
-        j++;
+        ++j;
     }
 }
 
-void testCase3()
-{
-    Display display;
-    char string[] = "Hello, C world!";
-
-    display.print(string);
-    display.print(10, 10, string, color::green);
-    display.print(string);
-    display.print(10, 100, string);
-}
 /******************************************/
 
 void main()
 {
-    testCase3();
+    testCase2();
 }
