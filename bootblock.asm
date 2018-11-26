@@ -3,7 +3,7 @@
 jmp 0x0:bootblock
 
 %include "gdt.inc"
-%define SECTORS 4            ; sectors to read
+%define SECTORS 5            ; how many sectors read from disk
 
 clear_screen:
 	pusha
@@ -13,16 +13,16 @@ clear_screen:
     popa
     ret
 
-read_disk: ;0x7e0
+read_disk:                   
     pusha
-    mov ax, 0x7e0            ; load buffer address to [es:bx]
+    mov ax, 0x7e0            ; load buffer address (0x7e0) to [es:bx]
     mov es, ax
-    mov ah, 02h              ; чтение сектора
-    mov dl, 80h              ; номер диска
-    mov dh, 00h              ; номер головки  (стороны диска)
-    mov ch, 00h              ; номер дорожки
-    mov cl, 02h              ; номер сектора
-    mov al, SECTORS          ; число секторов
+    mov ah, 02h              ; read sector
+    mov dl, 80h              ; disk number
+    mov dh, 00h              ; head number
+    mov ch, 00h              ; track number
+    mov cl, 02h              ; sector number
+    mov al, SECTORS          ; sectors count
     int 13h
     popa
     ret
@@ -30,15 +30,15 @@ read_disk: ;0x7e0
 install_gdt:
 	pusha
     cli	
-	lgdt [gdt]		; load GDT into GDTR
+	lgdt [gdt]		          ; load GDT into GDTR
 	sti
-	popa			; restore registers
+	popa
 	ret
 
 set_pe_bit:
     pusha
     cli	
-	mov	eax, cr0	; set bit 0 in cr0--enter pmode
+	mov	eax, cr0	           ; set bit 0 in cr0--enter pmode
 	or	eax, 1
 	mov	cr0, eax
     popa
@@ -53,7 +53,7 @@ bootblock:
     call read_disk
     call install_gdt
     call set_pe_bit
-    jmp 08h:0x7e00      ;jmp to protected_mode
+    jmp 08h:0x7e00             ; jump to protected_mode
 
 times (510-($-$$)) nop
 dw 0xaa55

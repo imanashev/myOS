@@ -25,4 +25,3 @@ gdt_end:
 gdt: 
     dw gdt_end - gdt_start - 1    ; limit (Size of GDT)
     dd gdt_start                  ; base of GDT
-

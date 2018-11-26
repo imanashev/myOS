@@ -13,5 +13,5 @@ reset_segments:
 
 kernel:
     call reset_segments
-    call main              ;go in c world
+    call main                  ; go in c world
     jmp $
