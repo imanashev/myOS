@@ -3,16 +3,16 @@
 #define SCROLL_LINES 4
 
 namespace color {
-enum {
-    black,        blue,
-    green,        cyan,
-    red,          magenta,
-    brown,        light_gray,
-    dark_gray,    light_blue,
-    light_green,  light_cyan,
-    light_red,    light_magenta,
-    yellow,       white
-};
+    enum {
+        black,        blue,
+        green,        cyan,
+        red,          magenta,
+        brown,        light_gray,
+        dark_gray,    light_blue,
+        light_green,  light_cyan,
+        light_red,    light_magenta,
+        yellow,       white
+    };
 } // namespace color
 
 class Screen {
@@ -28,17 +28,17 @@ public:
         char c = string[0];
         for(int i = 1; c; ++i) {
             switch (c) {
-            case 9: {
-                tab();
-                break;
-            }
-            case 10: {
-                newLine();
-                break;
-            }
-            default: {
-                print(c, color);
-            }
+                case 9: {
+                    tab();
+                    break;
+                }
+                case 10: {
+                    newLine();
+                    break;
+                }
+                default: {
+                    print(c, color);
+                }
             }
             c = string[i];
         }
@@ -81,8 +81,15 @@ private:
     }
 
     void tab() {
-        const char tab[] = "    ";
-        print(tab);
+        // end of screen case
+        if (xPos > screenWidth - 3) {
+            newLine();
+            return;
+        }
+        int spaces = 4 - (xPos % 4);
+        for (int i = 0; i < spaces; ++i) {
+            print(' ');
+        }
     }
 
     void incXPos() {
@@ -111,17 +118,17 @@ private:
 
 /******************************************/
 
+// scroll 1
 void testCase1()
 {
     Screen screen;
-    char string1[] = "Hello, C world!\n";
-    char string2[] = "FooBar\n";
 
-    screen.print(string1, color::red);
-    screen.print(string2, color::green);
+    screen.print("Hello, C world!\n", color::red);
+    screen.print("FooBar\n", color::green);
     screen.scroll();
 }
 
+// scroll 2
 void testCase2()
 {
     Screen screen;
@@ -143,9 +150,23 @@ void testCase2()
     }
 }
 
+// tabs
+void testCase3()
+{
+    Screen screen;
+
+    screen.print("12341234123412341234123412341234123412341234123412341234123412341234123412341234\n");
+    screen.print("\ttab\n");
+    screen.print("1\ttab\n");
+    screen.print("12\ttab\n");
+    screen.print("123\ttab\n");
+    screen.print("1234\ttab\n");
+    screen.print("23456789abcdefghijklmnopqrstuvwxyz123456789123456789abcdefghijklmnopqrstuvwxyz\t12");
+}
+
 /******************************************/
 
 void main()
 {
-    testCase2();
+    testCase3();
 }
