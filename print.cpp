@@ -45,11 +45,10 @@ public:
     }
 
     void print(int number, int color = color::white) {
-        // Todo: cant print 0
-        if(number != 0) {
-            print(number / 10, color);
-            const char digit = '0' + (number % 10);
-            print(digit, color);
+        if(number) {
+            printNumHelper(number, color);
+        } else {
+            print('0', color);
         }
     }
 
@@ -75,6 +74,14 @@ public:
     }
 
 private:
+    void printNumHelper(int number, int color = color::white) {
+        if(number != 0) {
+            printNumHelper(number / 10, color);
+            const char digit = '0' + (number % 10);
+            print(digit, color);
+        }
+    }
+
     void newLine() {
         incYPos();
         xPos = 0;
@@ -118,6 +125,26 @@ private:
 
 /******************************************/
 
+// void panic(const char *errorMsg, 
+//            const char *path = __FILE__, 
+//            int line = __LINE__) 
+void panic(const char *errorMsg, const char *path, int line) 
+{
+    Screen screen;
+    
+    screen.print("\nInternal error: '", color::red);
+    screen.print(errorMsg, color::yellow);
+    screen.print("' at '", color::red);
+    screen.print(path, color::yellow);
+    screen.print("', line ", color::red);
+    screen.print(line, color::yellow);
+    screen.print("\n");
+}
+
+#define panic(errorMsg) panic(errorMsg, __FILE__, __LINE__)
+
+/******************************************/
+
 // scroll 1
 void testCase1()
 {
@@ -132,6 +159,7 @@ void testCase1()
 void testCase2()
 {
     Screen screen;
+
     char string[] = ":\tHello, C world!\n";
     int i = 1;
     while(i <= 20) {
@@ -168,5 +196,5 @@ void testCase3()
 
 void main()
 {
-    testCase3();
+    panic("Big mistake!");
 }

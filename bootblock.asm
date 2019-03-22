@@ -1,9 +1,18 @@
 [ORG 0x7c00]
 [BITS 16]
-jmp 0x0:bootblock
+jmp 0x0:bootblock            ; init cs
 
 %include "gdt.inc"
-%define SECTORS 5            ; how many sectors read from disk
+%define SECTORS 10            ; how many sectors read from disk
+
+init_segments:
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    ret
 
 clear_screen:
 	pusha
@@ -28,32 +37,25 @@ read_disk:
     ret
 
 install_gdt:
-	pusha
-    cli	
 	lgdt [gdt]		          ; load GDT into GDTR
-	sti
-	popa
 	ret
 
 set_pe_bit:
     pusha
-    cli	
-	mov	eax, cr0	           ; set bit 0 in cr0--enter pmode
+	mov	eax, cr0	          ; set bit 0 in cr0
 	or	eax, 1
 	mov	cr0, eax
     popa
     ret
 
 bootblock:
-    xor ax, ax
-    mov ss, ax
-    mov ds, ax
-    mov es, ax
+    call init_segments
     call clear_screen
     call read_disk
+    cli                        ; clear interrupts
     call install_gdt
     call set_pe_bit
-    jmp 08h:0x7e00             ; jump to protected_mode
+    jmp 0x8:0x7e00             ; jump to protected_mode, set cs
 
 times (510-($-$$)) nop
 dw 0xaa55
