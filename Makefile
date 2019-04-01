@@ -1,13 +1,14 @@
-# print_source = /media/psf/Home/CLionProjects/myos/print.cpp
-print_source = print.cpp
-
 all:
 	nasm -fbin bootblock.asm
 
 	nasm -felf -o protected_mode.o protected_mode.asm
 
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o print.o $(print_source)
-	ld -T linker.ld -melf_i386 -o protected_mode protected_mode.o print.o
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o print.o print.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o panic.o panic.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o interrupts_handler.o interrupts_handler.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o main.o main.cpp
+
+	ld -T linker.ld -melf_i386 -o protected_mode protected_mode.o print.o panic.o main.o
 
 	# create disk
 	dd if=/dev/zero of=disk.img bs=1M count=1

@@ -1,50 +1,35 @@
-#define SCREEN_HIGH 25
-#define SCREEN_WIDTH 80
-#define SCROLL_LINES 4
+#include "print.h"
 
-namespace color {
-    enum {
-        black,        blue,
-        green,        cyan,
-        red,          magenta,
-        brown,        light_gray,
-        dark_gray,    light_blue,
-        light_green,  light_cyan,
-        light_red,    light_magenta,
-        yellow,       white
-    };
-} // namespace color
+Screen::Screen() : screenHigh(SCREEN_HIGH),
+            screenWidth(SCREEN_WIDTH),
+            videoMemory((unsigned short *)VIDEO_MEMORY),
+            xPos(0),
+            yPos(0)
+{}
 
-class Screen {
-public:
-    Screen() : screenHigh(SCREEN_HIGH),
-               screenWidth(SCREEN_WIDTH),
-               videoMemory((unsigned short *)0xb8000),
-               xPos(0),
-               yPos(0)
-    {}
-
-    void print(const char *string, int color = color::white) {
-        char c = string[0];
-        for(int i = 1; c; ++i) {
-            switch (c) {
-                case 9: {
-                    tab();
-                    break;
-                }
-                case 10: {
-                    newLine();
-                    break;
-                }
-                default: {
-                    print(c, color);
-                }
+void Screen::print(const char *string, int color)
+{
+    char c = string[0];
+    for(int i = 1; c; ++i) {
+        switch (c) {
+            case 9: {
+                tab();
+                break;
             }
-            c = string[i];
+            case 10: {
+                newLine();
+                break;
+            }
+            default: {
+                print(c, color);
+            }
         }
+        c = string[i];
     }
+}
 
-    void print(int number, int color = color::white) {
+    void Screen::print(int number, int color)
+    {
         if(number) {
             printNumHelper(number, color);
         } else {
@@ -52,12 +37,14 @@ public:
         }
     }
 
-    void print(const char symbol, int color = color::white) {
+    void Screen::print(const char symbol, int color)
+    {
         videoMemory[yPos * screenWidth + xPos] = symbol | (color << 8);
         incXPos();
     }
 
-    void scroll(int lines = 1) {
+    void Screen::scroll(int lines)
+    {
         int writePos = 0;
         int readPos = lines * screenWidth;
 
@@ -73,8 +60,8 @@ public:
         }
     }
 
-private:
-    void printNumHelper(int number, int color = color::white) {
+    void Screen::printNumHelper(int number, int color)
+    {
         if(number != 0) {
             printNumHelper(number / 10, color);
             const char digit = '0' + (number % 10);
@@ -82,12 +69,14 @@ private:
         }
     }
 
-    void newLine() {
+    void Screen::newLine()
+    {
         incYPos();
         xPos = 0;
     }
 
-    void tab() {
+    void Screen::tab()
+    {
         // end of screen case
         if (xPos > screenWidth - 3) {
             newLine();
@@ -99,102 +88,19 @@ private:
         }
     }
 
-    void incXPos() {
+    void Screen::incXPos()
+    {
         if (++xPos > screenWidth) {
             xPos = 0;
             incYPos();
         }
     }
 
-    void incYPos() {
+    void Screen::incYPos()
+    {
         if(yPos < screenHigh) {
             ++yPos;
         } else {
             scroll(SCROLL_LINES);
         }
     }
-
-    int xPos;
-    int yPos;
-
-    const int screenHigh;
-    const int screenWidth;
-
-    unsigned short *videoMemory;
-};
-
-/******************************************/
-
-// void panic(const char *errorMsg, 
-//            const char *path = __FILE__, 
-//            int line = __LINE__) 
-void panic(const char *errorMsg, const char *path, int line) 
-{
-    Screen screen;
-    
-    screen.print("\nInternal error: '", color::red);
-    screen.print(errorMsg, color::yellow);
-    screen.print("' at '", color::red);
-    screen.print(path, color::yellow);
-    screen.print("', line ", color::red);
-    screen.print(line, color::yellow);
-    screen.print("\n");
-}
-
-#define panic(errorMsg) panic(errorMsg, __FILE__, __LINE__)
-
-/******************************************/
-
-// scroll 1
-void testCase1()
-{
-    Screen screen;
-
-    screen.print("Hello, C world!\n", color::red);
-    screen.print("FooBar\n", color::green);
-    screen.scroll();
-}
-
-// scroll 2
-void testCase2()
-{
-    Screen screen;
-
-    char string[] = ":\tHello, C world!\n";
-    int i = 1;
-    while(i <= 20) {
-        screen.print(i);
-        screen.print(string, i % 15 + 1);
-        ++i;
-    }
-    int j = 0;
-    while(true) {
-        if(j % 10000000 == 0) {
-            screen.print(i);
-            screen.print(string, i % 15 + 1);
-            ++i;
-        }
-        ++j;
-    }
-}
-
-// tabs
-void testCase3()
-{
-    Screen screen;
-
-    screen.print("12341234123412341234123412341234123412341234123412341234123412341234123412341234\n");
-    screen.print("\ttab\n");
-    screen.print("1\ttab\n");
-    screen.print("12\ttab\n");
-    screen.print("123\ttab\n");
-    screen.print("1234\ttab\n");
-    screen.print("23456789abcdefghijklmnopqrstuvwxyz123456789123456789abcdefghijklmnopqrstuvwxyz\t12");
-}
-
-/******************************************/
-
-void main()
-{
-    panic("Big mistake!");
-}
