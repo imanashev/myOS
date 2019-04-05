@@ -3,10 +3,10 @@ all:
 
 	nasm -felf -o protected_mode.o protected_mode.asm
 
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o print.o print.cpp
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o panic.o panic.cpp
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o interrupts_handler.o interrupts_handler.cpp
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -c -o main.o main.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o print.o print.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o panic.o panic.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o interrupts_handler.o interrupts_handler.cpp
+	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o main.o main.cpp
 
 	ld -T linker.ld -melf_i386 -o protected_mode protected_mode.o print.o panic.o main.o
 
