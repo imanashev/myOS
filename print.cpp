@@ -1,11 +1,8 @@
 #include "print.h"
 
-Screen::Screen() : screenHigh(SCREEN_HIGH),
-            screenWidth(SCREEN_WIDTH),
-            videoMemory((unsigned short *)VIDEO_MEMORY),
-            xPos(0),
-            yPos(0)
-{}
+int Screen::xPos = 0;
+int Screen::yPos = 0;
+unsigned short *Screen::videoMemory = (unsigned short *)VIDEO_MEMORY;
 
 void Screen::print(const char *string, int color)
 {

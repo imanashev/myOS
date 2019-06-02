@@ -2,14 +2,12 @@
 #include "print.h"
 
 void panic(const char *errorMsg, const char *path, int line) 
-{
-    Screen screen;
-    
-    screen.print("\nInternal error: '", color::red);
-    screen.print(errorMsg, color::yellow);
-    screen.print("' at '", color::red);
-    screen.print(path, color::yellow);
-    screen.print("', line ", color::red);
-    screen.print(line, color::yellow);
-    screen.print("\n");
+{    
+    Screen::print("\nInternal error: '", color::red);
+    Screen::print(errorMsg, color::yellow);
+    Screen::print("' at '", color::red);
+    Screen::print(path, color::yellow);
+    Screen::print("', line ", color::red);
+    Screen::print(line, color::yellow);
+    Screen::print("\n");
 }

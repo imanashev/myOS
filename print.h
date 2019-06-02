@@ -22,30 +22,30 @@ class Screen {
 public:
     Screen();
 
-    void print(const char *string, int color = color::white);
+    static void print(const char *string, int color = color::white);
 
-    void print(int number, int color = color::white);
+    static void print(int number, int color = color::white);
 
-    void print(const char symbol, int color = color::white);
+    static void print(const char symbol, int color = color::white);
 
-    void scroll(int lines = 1);
+    static void scroll(int lines = 1);
 
 private:
-    void printNumHelper(int number, int color = color::white);
+    static void printNumHelper(int number, int color = color::white);
 
-    void newLine();
+    static void newLine();
 
-    void tab();
+    static void tab();
 
-    void incXPos();
+    static void incXPos();
 
-    void incYPos();
+    static void incYPos();
 
-    int xPos;
-    int yPos;
+    static int xPos;
+    static int yPos;
 
-    const int screenHigh;
-    const int screenWidth;
+    static const int screenHigh = SCREEN_HIGH;
+    static const int screenWidth = SCREEN_WIDTH;
 
-    unsigned short *videoMemory;
+    static unsigned short *videoMemory;
 };

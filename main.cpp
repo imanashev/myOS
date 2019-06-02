@@ -6,30 +6,30 @@
 // scroll 1
 void testCase1()
 {
-    Screen screen;
+    // Screen screen;
 
-    screen.print("Hello, C world!\n", color::red);
-    screen.print("FooBar\n", color::green);
-    screen.scroll();
+    Screen::print("Hello, C world!\n", color::red);
+    Screen::print("FooBar\n", color::green);
+    Screen::scroll();
 }
 
 // scroll 2
 void testCase2()
 {
-    Screen screen;
+    // Screen screen;
 
     char string[] = ":\tHello, C world!\n";
     int i = 1;
     while(i <= 20) {
-        screen.print(i);
-        screen.print(string, i % 15 + 1);
+        Screen::print(i);
+        Screen::print(string, i % 15 + 1);
         ++i;
     }
     int j = 0;
     while(true) {
         if(j % 10000000 == 0) {
-            screen.print(i);
-            screen.print(string, i % 15 + 1);
+            Screen::print(i);
+            Screen::print(string, i % 15 + 1);
             ++i;
         }
         ++j;
@@ -39,15 +39,13 @@ void testCase2()
 // tabs
 void testCase3()
 {
-    Screen screen;
-
-    screen.print("12341234123412341234123412341234123412341234123412341234123412341234123412341234\n");
-    screen.print("\ttab\n");
-    screen.print("1\ttab\n");
-    screen.print("12\ttab\n");
-    screen.print("123\ttab\n");
-    screen.print("1234\ttab\n");
-    screen.print("23456789abcdefghijklmnopqrstuvwxyz123456789123456789abcdefghijklmnopqrstuvwxyz\t12");
+    Screen::print("12341234123412341234123412341234123412341234123412341234123412341234123412341234\n");
+    Screen::print("\ttab\n");
+    Screen::print("1\ttab\n");
+    Screen::print("12\ttab\n");
+    Screen::print("123\ttab\n");
+    Screen::print("1234\ttab\n");
+    Screen::print("23456789abcdefghijklmnopqrstuvwxyz123456789123456789abcdefghijklmnopqrstuvwxyz\t12");
 }
 
 /******************************************/

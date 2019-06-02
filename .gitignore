@@ -1,4 +1,4 @@
 bootblock
-protected_mode
+os
 *.o
 disk.img
