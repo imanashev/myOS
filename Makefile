@@ -1,25 +1,29 @@
+CPP_FLAGS=-ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c
+
 all:
-	nasm -fbin bootblock.asm
+	nasm -fbin bootblock.asm -o ./build/bootblock
 
-	nasm -felf -o protected_mode.o protected_mode.asm
+	nasm -felf protected_mode.asm -o ./build/protected_mode.o
 
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o print.o print.cpp
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o panic.o panic.cpp
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o interrupts_handler.o interrupts_handler.cpp
-	g++ -ffreestanding -nostdlib -fno-rtti -fno-exceptions -fno-builtin -m32 -fno-pie -c -o main.o main.cpp
+	g++ $(CPP_FLAGS) print.cpp -o ./build/print.o
+	g++ $(CPP_FLAGS) panic.cpp -o ./build/panic.o 
+	g++ $(CPP_FLAGS) interrupts_handler.cpp -o ./build/interrupts_handler.o
+	g++ $(CPP_FLAGS) main.cpp -o ./build/main.o
 
-	ld -T linker.ld -melf_i386 -o os protected_mode.o print.o panic.o main.o
+	ld -T linker.ld -melf_i386 ./build/protected_mode.o ./build/print.o ./build/panic.o ./build/main.o -o ./build/kernel
 
 	# create disk
-	dd if=/dev/zero of=disk.img bs=1M count=1
+	dd if=/dev/zero of=./build/disk.img bs=1M count=1
 
 	# write on disk
-	dd if=bootblock of=disk.img bs=512 count=1 conv=notrunc
-	dd if=os of=disk.img conv=notrunc seek=1
+	dd if=./build/bootblock of=./build/disk.img bs=512 count=1 conv=notrunc
+	dd if=./build/kernel of=./build/disk.img conv=notrunc seek=1
 	
 run:	
-	echo 'c' | bochs -qf bochsrc
+	bochs -qf boch.conf
+
+r:
+	echo 'c' | bochs -qf bochs.conf
 
 clean:
-	rm -rf bootblock os print.o protected_mode.o panic.o interrupts_handler.o main.o
-	rm -rf disk.img
+	rm -f ./build/*
