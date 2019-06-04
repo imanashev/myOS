@@ -7,8 +7,6 @@
 // scroll 1
 void testCase1()
 {
-    // Screen screen;
-
     Screen::print("Hello, C world!\n", color::red);
     Screen::print("FooBar\n", color::green);
     Screen::scroll();
@@ -17,8 +15,6 @@ void testCase1()
 // scroll 2
 void testCase2()
 {
-    // Screen screen;
-
     char string[] = ":\tHello, C world!\n";
     int i = 1;
     while(i <= 20) {
