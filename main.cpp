@@ -1,5 +1,6 @@
 #include "print.h"
 #include "panic.h"
+#include "isr.h"
 
 #define panic(errorMsg) panic(errorMsg, __FILE__, __LINE__)
 
@@ -48,10 +49,18 @@ void testCase3()
     Screen::print("23456789abcdefghijklmnopqrstuvwxyz123456789123456789abcdefghijklmnopqrstuvwxyz\t12");
 }
 
+// interrupts
+void testCase4()
+{
+    __asm__ __volatile__("int $2");
+    __asm__ __volatile__("int $3");
+}
+
 /******************************************/
 
 void main()
 {
-    testCase1();
-    panic("Big mistake!");
+    init_isr();
+
+    testCase4();
 }
