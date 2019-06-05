@@ -45,11 +45,17 @@ void testCase3()
     Screen::print("23456789abcdefghijklmnopqrstuvwxyz123456789123456789abcdefghijklmnopqrstuvwxyz\t12");
 }
 
-// interrupts
+// interrupts without error code
 void testCase4()
 {
     __asm__ __volatile__("int $2");
     __asm__ __volatile__("int $3");
+}
+
+// interrupt with error code (endless loop because stack is corrupted)
+void testCase5()
+{
+    __asm__ __volatile__("int $0xb");
 }
 
 /******************************************/
@@ -58,5 +64,5 @@ void main()
 {
     init_isr();
 
-    testCase4();
+    testCase5();
 }

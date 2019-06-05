@@ -9,4 +9,4 @@ typedef struct {
 } registers_t;
 
 void init_isr();
-void isr_handler(registers_t r);
+extern "C" void isr_handler(registers_t r);
