@@ -2,6 +2,7 @@
 #include "panic.h"
 #include "isr.h"
 #include "pic8259.h"
+#include "timer.h"
 
 #define panic(errorMsg) panic(errorMsg, __FILE__, __LINE__)
 
@@ -59,6 +60,13 @@ void testCase5()
     __asm__ __volatile__("int $0xb");
 }
 
+// timer throw pic8259
+void testCase6()
+{
+    asm volatile("sti");
+    init_timer();
+}
+
 /******************************************/
 
 void main()
@@ -66,5 +74,5 @@ void main()
     init_isr();
     init_pic8259();
 
-    testCase4();
+    testCase6();
 }

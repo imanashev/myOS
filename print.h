@@ -30,10 +30,10 @@ public:
 
     static void scroll(int lines = 1);
 
+    static void newLine();
+
 private:
     static void printNumHelper(int number, int color = color::white);
-
-    static void newLine();
 
     static void tab();
 
