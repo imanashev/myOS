@@ -8,5 +8,8 @@ typedef struct {
    u32 eip, cs, eflags, useresp, ss;            // Pushed by the processor automatically
 } registers_t;
 
+typedef void (*isr_t)(registers_t);
+
 void init_isr();
 extern "C" void isr_handler(registers_t r);
+extern "C" void irq_handler(registers_t r);

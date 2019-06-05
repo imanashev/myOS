@@ -2,7 +2,6 @@
 
 namespace {
 #define KERNEL_CS 0x08
-#define IDT_ENTRIES 256
 
 typedef struct {
     u16 low_offset; // Lower 0..15 bits of handler function address

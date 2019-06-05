@@ -1,8 +1,12 @@
 #include "isr.h"
 #include "idt.h"
 #include "print.h"
+#include "ports.h"
 
 namespace {
+
+isr_t interrupt_handlers[IDT_ENTRIES];
+
 const char *exception_messages[] = {
     "Division By Zero",
     "Debug",
@@ -44,17 +48,21 @@ const char *exception_messages[] = {
 
 extern "C" 
 {
-    #define GATE(n) void isr ## n();
+    #define ISR(n) void isr ## n();
+    #define IRQ(n) void irq ## n();
     #include "idt_gates.h"
-    #undef GATE
+    #undef IRQ
+    #undef ISR
 }
 
 void init_isr() 
 {
-    #define GATE(n) set_idt_gate(n, (u32)isr ## n);
+    #define ISR(n) set_idt_gate(n, (u32)isr ## n);
+    #define IRQ(n) set_idt_gate(n, (u32)irq ## n);
     #include "idt_gates.h"
-    #undef GATE
-  
+    #undef IRQ
+    #undef ISR
+
     set_idt(); // Load with ASM
 }
 
@@ -69,4 +77,24 @@ void isr_handler(registers_t r)
     Screen::print("'\nError code: ", color::red);
     Screen::print((int)r.err_code, color::yellow);
     Screen::print("\n\n");
+}
+
+void irq_handler(registers_t r)
+{
+    // send EOI to the PICs
+    bool is_slave = r.int_no >= 40;
+    if (is_slave) {
+        send_byte_to_port(0xA0, 0x20);
+    }
+    send_byte_to_port(0x20, 0x20); // master
+
+    if (interrupt_handlers[r.int_no] != 0) {
+        isr_t handler = interrupt_handlers[r.int_no];
+        handler(r);
+    }
+}
+
+void register_interrupt_handler(u8 n, isr_t handler)
+{
+    interrupt_handlers[n] = handler;
 }

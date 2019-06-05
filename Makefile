@@ -6,7 +6,7 @@ all:
 	nasm -felf protected_mode.asm -o ./build/protected_mode.o
 	nasm -felf interrupts.asm -o ./build/interrupts.o
 
-	g++ $(CPP_FLAGS) -T linker.ld ./build/interrupts.o print.cpp panic.cpp isr.cpp idt.cpp main.cpp  -o ./build/kernel
+	g++ $(CPP_FLAGS) -T linker.ld ./build/interrupts.o *.cpp  -o ./build/kernel
 
 	# create disk
 	dd if=/dev/zero of=./build/disk.img bs=1M count=1

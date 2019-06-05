@@ -1,6 +1,6 @@
 [extern isr_handler] ; Defined in isr.h
+[extern irq_handler] ; Defined in isr.h
 
-; Common ISR code
 isr_common_stub:
     ; 1. Save CPU state
 	pusha           ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
@@ -26,10 +26,31 @@ isr_common_stub:
 	sti
 	iret        ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 
+irq_common_stub:
+    pusha
+    mov ax, ds
+    push eax
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    call irq_handler ; Different than the ISR code
+
+    pop ebx          ; Different than the ISR code
+    mov ds, bx
+    mov es, bx
+    mov fs, bx
+    mov gs, bx
+    popa
+    add esp, 8
+    sti
+    iret
+
 %macro ISR_WITHOUT_ERRCODE 1
     [global isr%1]
     isr%1:
-        cli
         push byte 0
         push byte %1
         jmp isr_common_stub
@@ -38,41 +59,43 @@ isr_common_stub:
 %macro ISR_WITH_ERRCODE 1
     [global isr%1]
     isr%1:
-        cli
         push byte %1
         jmp isr_common_stub
 %endmacro
+
+%macro IRQ 1
+    [global irq%1]
+    irq%1:
+        push byte 0
+        push byte %1
+        jmp irq_common_stub
+%endmacro
 	
-ISR_WITHOUT_ERRCODE 0
-ISR_WITHOUT_ERRCODE 1
-ISR_WITHOUT_ERRCODE 2
-ISR_WITHOUT_ERRCODE 3
-ISR_WITHOUT_ERRCODE 4
-ISR_WITHOUT_ERRCODE 5
-ISR_WITHOUT_ERRCODE 6
-ISR_WITHOUT_ERRCODE 7
+; Code generation
+
+%assign n 0
+%rep 8 - n
+    ISR_WITHOUT_ERRCODE n
+    %assign n n + 1
+%endrep
+
 ISR_WITH_ERRCODE    8
 ISR_WITHOUT_ERRCODE 9
-ISR_WITH_ERRCODE    10
-ISR_WITH_ERRCODE    11
-ISR_WITH_ERRCODE    12
-ISR_WITH_ERRCODE    13
-ISR_WITH_ERRCODE    14
-ISR_WITHOUT_ERRCODE 15
-ISR_WITHOUT_ERRCODE 16
-ISR_WITHOUT_ERRCODE 17
-ISR_WITHOUT_ERRCODE 18
-ISR_WITHOUT_ERRCODE 19
-ISR_WITHOUT_ERRCODE 20
-ISR_WITHOUT_ERRCODE 21
-ISR_WITHOUT_ERRCODE 22
-ISR_WITHOUT_ERRCODE 23
-ISR_WITHOUT_ERRCODE 24
-ISR_WITHOUT_ERRCODE 25
-ISR_WITHOUT_ERRCODE 26
-ISR_WITHOUT_ERRCODE 27
-ISR_WITHOUT_ERRCODE 28
-ISR_WITHOUT_ERRCODE 29
-ISR_WITHOUT_ERRCODE 30
-ISR_WITHOUT_ERRCODE 31
-ISR_WITHOUT_ERRCODE 31
+
+%assign n 10
+%rep 15 - n
+    ISR_WITH_ERRCODE n
+    %assign n n + 1
+%endrep
+
+%rep 32 - n
+    ISR_WITHOUT_ERRCODE n
+    %assign n n + 1
+%endrep
+
+%rep 48 - n
+    IRQ n
+    %assign n n + 1
+%endrep
+
+; i dont know why, but without this line code doesnt compiles...
