@@ -2,6 +2,7 @@
 #include "types.h"
 
 #define IRQ0 32 // timer
+#define IRQ1 33 // keyboard
 
 typedef struct {
    u32 ds;                                      // Data segment selector

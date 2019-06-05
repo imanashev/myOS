@@ -1,10 +1,5 @@
 #pragma once
 
-#define SCREEN_HIGH 25
-#define SCREEN_WIDTH 80
-#define VIDEO_MEMORY 0xb8000
-#define SCROLL_LINES 4
-
 namespace color {
     enum {
         black,        blue,
@@ -18,34 +13,23 @@ namespace color {
     };
 } // namespace color
 
-class Screen {
-public:
-    Screen();
+namespace Screen {
 
-    static void print(const char *string, int color = color::white);
+#define SCREEN_HIGH 25
+#define SCREEN_WIDTH 80
+#define VIDEO_MEMORY 0xb8000
+#define SCROLL_LINES 4
 
-    static void print(int number, int color = color::white);
+void print(const char *string, int color = color::white);
 
-    static void print(const char symbol, int color = color::white);
+void print(char *string, int color = color::white);
 
-    static void scroll(int lines = 1);
+void print(int number, int color = color::white);
 
-    static void newLine();
+void print(const char symbol, int color = color::white);
 
-private:
-    static void printNumHelper(int number, int color = color::white);
+void scroll(int lines = 1);
 
-    static void tab();
+void newLine();
 
-    static void incXPos();
-
-    static void incYPos();
-
-    static int xPos;
-    static int yPos;
-
-    static const int screenHigh = SCREEN_HIGH;
-    static const int screenWidth = SCREEN_WIDTH;
-
-    static unsigned short *videoMemory;
-};
+} // namespace Screen
