@@ -4,20 +4,14 @@
 #include "isr.h"
 #include "print.h"
 
-int tick = 0;
-
-void Tick()
-{
-    Screen::print("Tick: ");
-    Screen::print(tick / 100);
-    Screen::print("\n");
-}
-
 void timer_callback(registers_t regs)
 {
+    static int tick = 0;
     ++tick;
-    if (tick % 100 == 0) {
-        Tick();
+    if (tick % 200 == 0) {
+        Screen::print("Tick: ");
+        Screen::print(tick / 200);
+        Screen::print("\n");
     }
 }
 
