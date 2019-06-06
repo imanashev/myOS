@@ -6,15 +6,14 @@
 
 int tick = 0;
 
-static void Tick()
+void Tick()
 {
-    // Todo: fix print string method
     Screen::print("Tick: ");
     Screen::print(tick / 100);
     Screen::print("\n");
 }
 
-static void timer_callback(registers_t regs)
+void timer_callback(registers_t regs)
 {
     ++tick;
     if (tick % 100 == 0) {
