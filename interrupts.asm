@@ -97,5 +97,3 @@ ISR_WITHOUT_ERRCODE 9
     IRQ n
     %assign n n + 1
 %endrep
-
-; i dont know why, but without this line code doesnt compiles...

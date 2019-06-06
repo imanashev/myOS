@@ -3,7 +3,7 @@
 jmp 0x0:bootblock            ; init cs
 
 %include "gdt.inc"
-%define SECTORS 10            ; how many sectors read from disk
+%define SECTORS 50            ; how many sectors read from disk
 
 init_segments:
     xor ax, ax

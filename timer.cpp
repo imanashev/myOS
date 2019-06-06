@@ -9,14 +9,9 @@ int tick = 0;
 static void Tick()
 {
     // Todo: fix print string method
-    Screen::print('T');
-    Screen::print('i');
-    Screen::print('c');
-    Screen::print('k');
-    Screen::print(':');
-    Screen::print(' ');
+    Screen::print("Tick: ");
     Screen::print(tick / 100);
-    Screen::newLine();
+    Screen::print("\n");
 }
 
 static void timer_callback(registers_t regs)

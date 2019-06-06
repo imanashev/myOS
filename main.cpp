@@ -72,7 +72,7 @@ void testCase6()
 void testCase7()
 {
     asm volatile("sti");
-    // init_keyboard();
+    init_keyboard();
 }
 
 /******************************************/
@@ -80,8 +80,6 @@ void testCase7()
 void main()
 {
     init_isr();
-    // init_pic8259();
-    // testCase6();
-
-    testCase4();
+    init_pic8259();
+    testCase7();
 }
