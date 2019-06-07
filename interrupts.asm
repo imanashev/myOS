@@ -3,7 +3,7 @@
 
 isr_common_stub:
     ; 1. Save CPU state
-	pusha           ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+	pushad          ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 	mov ax, ds      ; Lower 16-bits of eax = ds.
 	push eax        ; save the data segment descriptor
 	mov ax, 0x10    ; kernel data segment descriptor
@@ -21,13 +21,12 @@ isr_common_stub:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	popa        ; Pop edi,esi,ebp,esp,ebx,edx,ecx,eax
+	popad       ; Pop edi,esi,ebp,esp,ebx,edx,ecx,eax
 	add esp, 8  ; Cleans up the pushed error code and pushed ISR number
-	sti
 	iret        ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 
 irq_common_stub:
-    pusha
+    pushad
     mov ax, ds
     push eax
     mov ax, 0x10
@@ -43,9 +42,8 @@ irq_common_stub:
     mov es, bx
     mov fs, bx
     mov gs, bx
-    popa
+    popad
     add esp, 8
-    sti
     iret
 
 %macro ISR_WITHOUT_ERRCODE 1
