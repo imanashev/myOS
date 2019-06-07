@@ -31,9 +31,15 @@ const char *parse_code(u8 scancode)
 
 void keyboard_callback(registers_t regs)
 {
-    // PIC store scancode in port 0x60
-    u8 scancode = read_byte_from_port(0x60);
-    Screen::print(parse_code(scancode));
+    u8 status = read_byte_from_port(0x64);
+
+    bool is_buffer_full = status & 0x1;
+    bool is_keyboard = !(status & 0x20);
+    if (is_buffer_full && is_keyboard) {
+        // PIC store scancode in port 0x60
+        u8 scancode = read_byte_from_port(0x60);
+        Screen::print(parse_code(scancode));
+    }
 }
 
 void init_keyboard()

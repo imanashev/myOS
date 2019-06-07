@@ -81,5 +81,5 @@ void main()
 {
     init_isr();
     init_pic8259();
-    testCase6();
+    testCase7();
 }
