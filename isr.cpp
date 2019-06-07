@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "print.h"
 #include "ports.h"
+#include "pic8259.h"
 
 namespace {
 
@@ -84,9 +85,9 @@ void irq_handler(registers_t r)
     // send EOI to the PICs
     bool is_slave = r.int_no >= 40;
     if (is_slave) {
-        send_byte_to_port(0xA0, 0x20);
+        port::outb(PIC2_COMMAND, 0x20);
     }
-    send_byte_to_port(0x20, 0x20); // master
+    port::outb(PIC1_COMMAND, 0x20); // master
 
     if (interrupt_handlers[r.int_no] != 0) {
         isr_t handler = interrupt_handlers[r.int_no];
@@ -97,4 +98,5 @@ void irq_handler(registers_t r)
 void register_interrupt_handler(u8 n, isr_t handler)
 {
     interrupt_handlers[n] = handler;
+    enable_irq(n);
 }

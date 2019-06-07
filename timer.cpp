@@ -23,7 +23,7 @@ void init_timer()
     u32 divisor = 1193180;
 
     // send the command
-    send_byte_to_port(0x43, 0x36); // command port
-    send_byte_to_port(0x40, low_8(divisor));
-    send_byte_to_port(0x40, high_8(divisor));
+    port::outb(0x43, 0x36); // command port
+    port::outb(0x40, low_8(divisor));
+    port::outb(0x40, high_8(divisor));
 }
