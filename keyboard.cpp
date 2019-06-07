@@ -16,14 +16,14 @@ const char *parse_code(u8 scancode)
 {
     if (scancode <= 0x39) {
         // key down
-        return "";
+        return scancodes[scancode];
 
     } else if (scancode <= 0x7f) {
         return "[UnknownKeyDown]";
 
     } else if (scancode <= 0x39 + 0x80) {
         // key up
-        return scancodes[scancode - 0x80];
+        return "";
     } else {
         return "[UnknownKeyUp]";
     }
