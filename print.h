@@ -18,11 +18,9 @@ namespace Screen {
 #define SCREEN_HIGH 25
 #define SCREEN_WIDTH 80
 #define VIDEO_MEMORY 0xb8000
-#define SCROLL_LINES 4
+#define SCROLL_LINES 1
 
 void print(const char *string, int color = color::white);
-
-void print(char *string, int color = color::white);
 
 void print(int number, int color = color::white);
 

@@ -1,5 +1,7 @@
 #include "print.h"
 #include "types.h"
+#include "multitasking.h"
+#include "isr.h"
 
 namespace Screen {
 
@@ -36,12 +38,6 @@ void print(const char *string, int color)
     }
 }
 
-void print(char *string, int color)
-{
-    const char* str = string;
-    print(str, color);
-}
-
 void print(int number, int color)
 {
     if(number) {
@@ -53,17 +49,23 @@ void print(int number, int color)
 
 void print(const char symbol, int color)
 {
+    lock();
+
     videoMemory[yPos * screenWidth + xPos] = symbol | (color << 8);
     incXPos();
+
+    unlock();
 }
 
 void scroll(int lines)
 {
+    lock();
+
     int writePos = 0;
     int readPos = lines * screenWidth;
 
     //memory after visible screen (screenWidth * screenHigh) must be null
-    while (writePos <= screenWidth * screenHigh) {
+    while (writePos <= screenWidth * (screenHigh + 1)) {
         videoMemory[writePos++] = videoMemory[readPos++];
     }
 
@@ -72,6 +74,8 @@ void scroll(int lines)
     } else {
         yPos = yPos - lines + 1;
     }
+
+    unlock();
 }
 
 void printNumHelper(int number, int color)
@@ -85,12 +89,18 @@ void printNumHelper(int number, int color)
 
 void newLine()
 {
+    lock();
+
     incYPos();
     xPos = 0;
+
+    unlock();
 }
 
 void tab()
 {
+    lock();
+
     // end of screen case
     if (xPos > screenWidth - 3) {
         newLine();
@@ -100,6 +110,8 @@ void tab()
     for (int i = 0; i < spaces; ++i) {
         print(' ');
     }
+
+    unlock();
 }
 
 void incXPos()
