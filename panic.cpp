@@ -1,7 +1,7 @@
 #include "panic.h"
 #include "print.h"
 
-void panic(const char *errorMsg, const char *path, int line) 
+void _panic(const char *errorMsg, const char *path, int line) 
 {    
     Screen::print("\nInternal error: '", color::red);
     Screen::print(errorMsg, color::yellow);
