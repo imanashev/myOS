@@ -1,6 +1,9 @@
 [extern isr_handler] ; Defined in isr.h
 [extern irq_handler] ; Defined in isr.h
 
+[extern timer_callback] ; Defined in timer.h
+[global irq_timer_handler]
+
 isr_common_stub:
     ; 1. Save CPU state
 	pushad          ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
@@ -44,6 +47,14 @@ irq_common_stub:
     mov gs, bx
     popad
     add esp, 8
+    iret
+
+irq_timer_handler:
+    pushad
+    push esp
+    call timer_callback
+    pop esp
+    popad
     iret
 
 %macro ISR_WITHOUT_ERRCODE 1
@@ -91,6 +102,9 @@ ISR_WITHOUT_ERRCODE 9
     %assign n n + 1
 %endrep
 
+; 32 - timer
+
+%assign n 33
 %rep 48 - n
     IRQ n
     %assign n n + 1

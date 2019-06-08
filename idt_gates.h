@@ -30,7 +30,7 @@ ISR(28)
 ISR(29)
 ISR(30)
 ISR(31)
-IRQ(32)
+// IRQ(32) - timer
 IRQ(33)
 IRQ(34)
 IRQ(35)
