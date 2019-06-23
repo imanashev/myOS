@@ -25,14 +25,12 @@ void init_pic8259()
 
 void enable_irq(u8 irq)
 {
-    u8 data = port::inb(PIC1_DATA);
-    u8 data_with_clear_bit = data & ~(1 << irq);
-    port::outb(PIC1_DATA, data_with_clear_bit);
+    u8 clear_bit = port::inb(PIC1_DATA) & ~(1 << irq);
+    port::outb(PIC1_DATA, clear_bit);
 }
 
 void disable_irq(u8 irq)
 {
-    u8 data = port::inb(PIC1_DATA);
-    u8 data_with_set_bit = data | (1 << irq);
-    port::outb(PIC1_DATA, data_with_set_bit);
+    u8 set_bit = port::inb(PIC1_DATA) | (1 << irq);
+    port::outb(PIC1_DATA, set_bit);
 }
