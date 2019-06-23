@@ -4,7 +4,7 @@
 
 task_t tasks[TASKS_COUNT];
 u8 stacks[TASKS_COUNT][TASK_STACK_SIZE];
-int current_task = -1;
+int current_task = 0;
 
 bool is_task_finished(int n) 
 {
@@ -28,12 +28,6 @@ void exit_handler() {
     irq_timer_handler();
 }
 
-void write(u32 &stack_ptr, u32 value, u32 offset)
-{
-    stack_ptr -= offset;
-    *((u32*)stack_ptr) = value;
-}
-
 void add_task(u32 func) 
 {
     for(int i = 0; i < TASKS_COUNT; ++i) {
@@ -46,17 +40,21 @@ void add_task(u32 func)
             Screen::print("\n");
             #endif
 
-            tasks[i].is_finished = 0;
+            u32 stack_end_ptr = (u32)&(stacks[i + 1]);
 
-            u32 stack_ptr = (u32)&(stacks[i + 1]);
+            auto write = [&stack_end_ptr] (u32 offset, u32 value) {
+                stack_end_ptr -= offset;
+                *((u32*)stack_end_ptr) = value;
+            };
 
-            write(stack_ptr, (u32)exit_handler,  4);   // return address
-            write(stack_ptr, (u32)514,           4);   // eflags
-            write(stack_ptr, (u32)8,             4);   // cs
-            write(stack_ptr, (u32)func,          4);   // eip
-            write(stack_ptr, (u32)(stack_ptr - 4), 4*7);
+            write(4,   (u32)exit_handler);        // return address
+            write(4,   (u32)514);                 // eflags
+            write(4,   (u32)8);                   // cs
+            write(4,   (u32)func);                // eip
+            write(4*7, (u32)(stack_end_ptr - 4)); // esp
             
-            tasks[i].esp = stack_ptr - 4;
+            tasks[i].esp = stack_end_ptr - 4;
+            tasks[i].is_finished = 0;
 
             unlock();
             return;
@@ -67,7 +65,8 @@ void add_task(u32 func)
 
 void init_multitasking()
 {
-    for(int i = 0; i < TASKS_COUNT; ++i) {
+    tasks[0].is_finished = 0;
+    for(int i = 1; i < TASKS_COUNT; ++i) {
         tasks[i].is_finished = 1;
     }
 }
