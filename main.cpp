@@ -7,12 +7,12 @@
 
 void main()
 {
-    init_isr();
-    init_pic8259();
-    enable_intr();
-    init_timer();
-    init_keyboard();
-    init_multitasking();
+    // init_isr();
+    // init_pic8259();
+    // enable_intr();
+    // init_timer();
+    // init_keyboard();
+    // init_multitasking();
 
     testCase8();
 }

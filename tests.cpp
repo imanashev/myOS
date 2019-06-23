@@ -87,6 +87,7 @@ void testCase7()
     init_keyboard();
 }
 
+void main_task();
 void task1();
 void task2();
 void task3();
@@ -104,12 +105,26 @@ void testCase8()
     init_multitasking();
     add_task((u32) task1);
     add_task((u32) task2);
+
+    main_task();
 }
 
 /* Tasks for multitasking testCase8 */
 /************************************/
 
 #define PRINT_DELAY 70
+
+void main_task()
+{
+    int i = 0;
+    while(1) {
+        Screen::print("Main task: ", color::brown);
+        Screen::print(i++, color::brown);
+        Screen::print("\n");
+
+        sleep(PRINT_DELAY);
+    }
+}
 
 void task1()
 {
